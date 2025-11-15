@@ -1,0 +1,316 @@
+S<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FLAMES Game — Friends, Love, Affection, Marriage, Enemy, Siblings</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#ff6b6b;
+      --glass: rgba(255,255,255,0.04);
+      --muted: #9aa4b2;
+      --glass-2: rgba(255,255,255,0.02);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1000px 500px at 10% 10%, #10243a 0%, transparent 12%), radial-gradient(800px 400px at 90% 90%, #1a2433 0%, transparent 12%), var(--bg);
+      color:#e6eef6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .wrap{
+      width:min(900px, 96%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:18px;
+      padding:28px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:20px;
+      align-items:start;
+    }
+
+    header{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .logo{
+      width:64px;height:64px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#ffb199,#ff6b6b);box-shadow:0 6px 18px rgba(255,107,107,0.12);
+      transform:rotate(-8deg);
+      transition:transform .35s ease;
+    }
+    .logo:hover{transform:rotate(0) scale(1.03)}
+    .logo .flame{width:34px;height:34px;position:relative}
+    .logo .flame::before,.logo .flame::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%}
+    .logo .flame::before{width:22px;height:28px;background:radial-gradient(circle at 35% 30%, #fff8, #fff0 30%),linear-gradient(180deg,#fff0,#ffd2);clip-path: polygon(50% 0, 63% 26%, 100% 43%, 63% 69%, 52% 100%, 45% 72%, 0 48%, 44% 27%);}
+    .logo .flame::after{width:12px;height:18px;background:linear-gradient(180deg,#ffd66b,#ff6b6b);left:54%;top:46%;opacity:.95;filter:blur(.2px)}
+
+    h1{font-size:20px;margin:0}
+    p.lead{color:var(--muted);margin:6px 0 0;font-size:13px}
+
+    /* Left panel */
+    .left{
+      padding:16px;
+      background: linear-gradient(180deg,var(--glass), var(--glass-2));
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+    label{font-size:13px;color:var(--muted)}
+    input[type=text]{padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;outline:none;font-size:15px;transition:transform .18s ease, box-shadow .18s ease}
+    input[type=text]:focus{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.5),0 0 0 4px rgba(255,107,107,0.05)}
+
+    .buttons{display:flex;gap:10px;margin-top:8px}
+    button.btn{flex:1;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600;letter-spacing:.4px}
+    button.primary{background:linear-gradient(90deg,#ff7b7b,#ff5a9e);color:white;box-shadow:0 8px 30px rgba(255,107,107,0.12);transform:translateY(0);transition:transform .15s ease, box-shadow .15s}
+    button.primary:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(255,90,110,0.18)}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+    /* Right panel */
+    .right{padding:16px;background:linear-gradient(180deg,var(--glass), transparent);border-radius:12px;border:1px solid rgba(255,255,255,0.03);min-height:220px}
+    .flames-board{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .flame-pill{padding:12px 16px;border-radius:999px;background:rgba(255,255,255,0.03);min-width:110px;text-align:center;font-weight:700;letter-spacing:.6px;transition:transform .2s, background .2s, box-shadow .2s;cursor:default}
+    .flame-pill:hover{transform:translateY(-6px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+
+    .flame-pill[data-key='F']{background:linear-gradient(90deg,#8bd3ff44,#6bffd6bb);color:#03384a}
+    .flame-pill[data-key='L']{background:linear-gradient(90deg,#ffd1d1,#ffb8e0);color:#4b092b}
+    .flame-pill[data-key='A']{background:linear-gradient(90deg,#fff3c4,#ffd9a6);color:#4a3610}
+    .flame-pill[data-key='M']{background:linear-gradient(90deg,#c6ffe2,#9affc9);color:#02381b}
+    .flame-pill[data-key='E']{background:linear-gradient(90deg,#ffb3b3,#ffd6d6);color:#2b0b0b}
+    .flame-pill[data-key='S']{background:linear-gradient(90deg,#e6e6ff,#d4d4ff);color:#1d1d4a}
+
+    .result{margin-top:18px;text-align:center}
+    .result .card{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .result .outcome{font-size:20px;font-weight:800;margin:8px 0}
+    .explain{color:var(--muted);font-size:13px}
+
+    /* elimination animation */
+    .eliminated{opacity:0.18;transform:scale(.88) rotate(-6deg);filter:grayscale(.6);text-decoration:line-through}
+
+    /* small screens */
+    @media(max-width:880px){
+      .wrap{grid-template-columns:1fr;}
+      .logo{width:56px;height:56px}
+    }
+
+    /* fancy pulse animation for final */
+    @keyframes pulse{
+      0%{transform:scale(1)}
+      50%{transform:scale(1.06)}
+      100%{transform:scale(1)}
+    }
+
+    .final{
+      animation:pulse 1.2s ease-in-out infinite;
+      box-shadow:0 14px 40px rgba(255,107,107,0.12);
+      transform-origin:center;
+    }
+
+    .small{font-size:12px;color:var(--muted);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application">
+    <header>
+      <div class="logo" title="FLAMES">
+        <div class="flame" aria-hidden="true"></div>
+      </div>
+      <div>
+        <h1>FLAMES — The Flame Game</h1>
+        <p class="lead">Enter two names and discover the playful relationship outcome.</p>
+      </div>
+    </header>
+
+    <section class="left" aria-labelledby="controls">
+      <div id="controls">
+        <div class="field">
+          <label for="name1">Your Name</label>
+          <input id="name1" type="text" placeholder="Type first name (e.g. Alex)" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="name2">Their Name</label>
+          <input id="name2" type="text" placeholder="Type second name (e.g. Sam)" autocomplete="off">
+        </div>
+
+        <div class="buttons">
+          <button id="calc" class="btn primary">Calculate</button>
+          <button id="reset" class="btn ghost">Reset</button>
+        </div>
+
+        <div class="small">Tip: only letters matter — spaces, punctuation, and numbers are ignored.</div>
+      </div>
+    </section>
+
+    <aside class="right" aria-labelledby="flames">
+      <h3 id="flames" style="margin-top:0;margin-bottom:10px">FLAMES</h3>
+      <div class="flames-board" id="board">
+        <div class="flame-pill" data-key="F">Friends</div>
+        <div class="flame-pill" data-key="L">Love</div>
+        <div class="flame-pill" data-key="A">Affection</div>
+        <div class="flame-pill" data-key="M">Marriage</div>
+        <div class="flame-pill" data-key="E">Enemy</div>
+        <div class="flame-pill" data-key="S">Siblings</div>
+      </div>
+
+      <div class="result" id="result">
+        <div class="card">
+          <div class="outcome">--</div>
+          <div class="explain">Start by entering two names and click <strong>Calculate</strong>.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // Utilities
+    const q = s => document.querySelector(s);
+    const board = q('#board');
+    const pills = [...board.querySelectorAll('.flame-pill')];
+    const name1In = q('#name1');
+    const name2In = q('#name2');
+    const calc = q('#calc');
+    const reset = q('#reset');
+    const resultCard = q('#result .card');
+    const outcomeLabel = q('.outcome');
+    const explain = q('.explain');
+
+    function sanitize(str){
+      return (str || '').toLowerCase().replace(/[^a-z]/g,'');
+    }
+
+    // FLAMES algorithm: remove common letters and count remaining
+    function flamesCount(a,b){
+      a = sanitize(a).split('');
+      b = sanitize(b).split('');
+      // remove matching letters one by one
+      for(let i=0;i<a.length;i++){
+        const ch = a[i];
+        const idx = b.indexOf(ch);
+        if(idx>-1){ a[i] = ''; b[idx] = ''; }
+      }
+      const rem = a.filter(Boolean).length + b.filter(Boolean).length;
+      return rem;
+    }
+
+    // elimination using the count: circularly eliminate letters
+    function flamesEliminate(count){
+      let items = ['F','L','A','M','E','S'];
+      let idx = 0;
+      const sequence = [];
+      while(items.length > 1){
+        // (count-1) steps forward from idx
+        idx = (idx + count - 1) % items.length;
+        sequence.push({eliminated:items[idx], remaining:[...items]});
+        items.splice(idx,1);
+        // idx remains at eliminated index for next round
+      }
+      return {winner:items[0], sequence};
+    }
+
+    function disableButtons(v){
+      calc.disabled = v;
+      reset.disabled = v;
+      calc.style.opacity = v?0.6:1;
+    }
+
+    async function showElimination(seq, winner){
+      // highlight elimination steps
+      for(const step of seq){
+        // mark remaining as dimmed except current
+        pills.forEach(p=>{
+          const key = p.dataset.key;
+          if(step.remaining.includes(key)){
+            p.classList.remove('eliminated');
+            p.style.opacity = '1';
+          } else p.classList.add('eliminated');
+        });
+        // briefly flash the eliminated one
+        const el = pills.find(p=>p.dataset.key===step.eliminated);
+        if(el){
+          el.animate([
+            {transform:'scale(1) rotate(0deg)', offset:0},
+            {transform:'scale(1.08) rotate(-6deg)', offset:0.4},
+            {opacity:0.22, transform:'scale(.86) rotate(-6deg)', offset:1}
+          ], {duration:550, easing:'cubic-bezier(.2,.8,.2,1)'});
+          el.classList.add('eliminated');
+        }
+        await new Promise(r => setTimeout(r, 560));
+      }
+
+      // final reveal animation
+      pills.forEach(p=>p.classList.add('eliminated'));
+      const winnerPill = pills.find(p=>p.dataset.key===winner);
+      if(winnerPill){
+        winnerPill.classList.remove('eliminated');
+        winnerPill.classList.add('final');
+        winnerPill.animate([{transform:'scale(.92)'},{transform:'scale(1.02)'},{transform:'scale(1)'}],{duration:700,easing:'ease-out'});
+      }
+    }
+
+    function describe(key){
+      switch(key){
+        case 'F': return ['Friends', 'You two share a friendly bond — good pals who enjoy each other\'s company.'];
+        case 'L': return ['Love', 'There is romantic interest — sparks may fly between you two.'];
+        case 'A': return ['Affection', 'Deep fondness and warmth — a soft, caring connection.'];
+        case 'M': return ['Marriage', 'A committed future — long-term partnership vibes.'];
+        case 'E': return ['Enemy', 'Opposites or rivalry — a cheeky outcome, often playful.'];
+        case 'S': return ['Siblings', 'A sibling-like bond — familiarity, teasing, and strong support.'];
+        default: return ['--','--'];
+      }
+    }
+
+    async function run(){
+      const n1 = name1In.value.trim();
+      const n2 = name2In.value.trim();
+      if(!sanitize(n1) || !sanitize(n2)){
+        outcomeLabel.textContent = '--';
+        explain.textContent = 'Please enter both names using letters only.';
+        return;
+      }
+
+      disableButtons(true);
+      outcomeLabel.textContent = 'Calculating...';
+      explain.textContent = 'Playing the elimination...';
+
+      // reset visuals
+      pills.forEach(p=>{p.classList.remove('eliminated','final');p.style.opacity='1'});
+
+      const cnt = flamesCount(n1,n2);
+      const {winner, sequence} = flamesEliminate(cnt || 6); // if count ==0 use 6 to avoid weirdness
+
+      // run the visual sequence
+      await showElimination(sequence, winner);
+
+      const [title,desc] = describe(winner);
+      outcomeLabel.textContent = title;
+      explain.textContent = desc + ` (Remaining letters count: ${cnt}).`;
+
+      disableButtons(false);
+    }
+
+    calc.addEventListener('click', run);
+    reset.addEventListener('click', ()=>{
+      name1In.value=''; name2In.value='';
+      outcomeLabel.textContent='--'; explain.textContent='Start by entering two names and click Calculate.';
+      pills.forEach(p=>{p.classList.remove('eliminated','final');p.style.opacity='1'});
+    });
+
+    // small UX: press Enter to calculate
+    [name1In,name2In].forEach(inp=>inp.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ calc.click(); }
+    }));
+  </script>
+</body>
+</html>
